@@ -28,15 +28,17 @@ server.listen(conf_port, function () {
     registry['start'](conf_port);
 });
 
+// Setup for less conversion
+app.use(require('less-middleware')(conf_path));
+
+// Setup for coffee conversion
+app.use(require('coffee-middleware')(conf_path));
+
 // Catch all
 app.use( express.static(conf_path) );
 
-
-
-
-
-// current version: 1
+// current version: 2
 //
 // changelog
 // ---------
-//
+//      added support for less and coffee conversion
