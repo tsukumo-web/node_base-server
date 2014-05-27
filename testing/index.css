@@ -1,0 +1,19 @@
+body
+{
+    background  : #EEE;
+}
+
+div#test-css:before
+{
+    content     : "CSS Working!";
+    display     : block;
+    width       : 100px;
+    background  : #333;
+    color       : #AAA;
+    font-size   : 28px;
+    font-family : "Helvetica Neue";
+    font-weight : 100;
+    text-align  : center;
+    padding     : 10px;
+    border-radius: 10px;
+}
