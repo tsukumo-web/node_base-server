@@ -1,0 +1,12 @@
+{
+    "name"          : "base-server",
+    "version"       : "0.0.1",
+    "description"   : "node.js base server",
+    "main"          : "server.js",
+    "author"        : "Christopher Kelley",
+    "license": "The MIT License",
+    "dependencies":
+    {
+        "express": "latest"
+    }
+}
