@@ -14,6 +14,11 @@ applications. Handles conversion of non-standard files.
 0.2.1 - Response wrapping - pre/post compilation callbacks
 1.0.0 - First release (Support from previous versions)
 
+1.0.1 - Less, Coffee (in house middleware)
+1.0.2 - Markdown (in house middleware)
+1.0.3 - Sass, Jade (in house middleware)
+2.0.0 - Second release (Support from previous versions)
+
 ## License
 
 The MIT License (MIT)
