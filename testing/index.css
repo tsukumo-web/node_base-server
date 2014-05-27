@@ -3,6 +3,11 @@ body
     background  : #EEE;
 }
 
+div
+{
+    margin      : 10px;
+}
+
 div#test-css:before
 {
     content     : "CSS Working!";
