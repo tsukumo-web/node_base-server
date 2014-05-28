@@ -34,6 +34,9 @@ app.use(require('less-middleware')(conf_path));
 // Setup for coffee conversion
 app.use(require('coffee-middleware')(conf_path));
 
+// Setup for markdown conversion
+app.use(require('express-markdown')({directory:conf_path}));
+
 // Catch all
 app.use( express.static(conf_path) );
 
