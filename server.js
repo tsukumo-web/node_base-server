@@ -40,8 +40,9 @@ app.use(require('express-markdown')({directory:conf_path}));
 // Catch all
 app.use( express.static(conf_path) );
 
-// current version: 2
+// current version: 3
 //
 // changelog
 // ---------
-//      added support for less and coffee conversion
+//     2 - added support for less and coffee conversion
+//     3 - added support for markdown conversion
