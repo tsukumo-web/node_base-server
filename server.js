@@ -28,8 +28,13 @@ server.listen(conf_port, function () {
     registry['start'](conf_port);
 });
 
+
+app.use(require('./middleware/convert-middleware.js')(conf_path,
+    [require('./middleware/convert-middleware-less.js')()]
+));
+
 // Setup for less conversion
-app.use(require('less-middleware')(conf_path));
+//app.use(require('less-middleware')(conf_path));
 
 // Setup for coffee conversion
 app.use(require('coffee-middleware')(conf_path));

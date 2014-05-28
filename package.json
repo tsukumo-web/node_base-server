@@ -7,9 +7,11 @@
     "license"       : "The MIT License",
     "dependencies":
     {
+        "node.extend"      : "latest",
         "express"          : "latest",
 
-        "less-middleware"  : "latest",
+        "less"             : "latest",
+
         "coffee-middleware": "latest",
         "express-markdown" : "latest"
     }
