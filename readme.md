@@ -10,8 +10,8 @@ applications. Handles conversion of non-standard files.
 0.0.1 - Standard files (non-standard return plain/text)
 0.1.1 - Less, CoffeeScript
 0.1.2 - Markdown
-0.1.3 - Sass, Jade
-0.2.1 - Response wrapping - pre/post compilation callbacks
+X 0.1.3 - Sass, Jade
+X 0.2.1 - Response wrapping - pre/post compilation callbacks
 1.0.0 - First release (Support from previous versions)
 
 1.0.1 - Less, Coffee (in house middleware)
