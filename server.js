@@ -1,53 +1,90 @@
 
 // author: Christopher Kelley, 2014
 
-// Load configuration
-var config      = require('./config.json');
+var extend = require('node.extend');
 
-var conf_port   = config['port'] || 3000;
-var conf_path   = __dirname + (config['path'] || '/public');
+var server;
+module.exports = server = (function(options){
 
-// Registry creation
-var registry = {
-    start: function(port){}
-};
+    var settings = extend({
+        port : 3000,
+        src  : __dirname + '/public',
 
-module.exports.on = function(evt, cb)
-{
-    registry[evt] = cb;
-}
+        middleware:
+        {
+            less   : { },
+            coffee : { }
+        }
+    }, options);
+    // Define after extend to collect extended source
+    settings.dest = settings.dest || settings.src;
 
-// Cache variables
-var express     = module.exports.express    = require('express');
-var app         = module.exports.app        = express();
-var http        = module.exports.http       = require('http');
-var server      = module.exports.server     = http.createServer(app);
+    var registry = {
+        start: function(port, path){ }
+    };
 
-// Start the server
-server.listen(conf_port, function () {
-    registry['start'](conf_port);
+    // Cache variables
+    var express = require('express');
+    var app     = express();
+    var http    = require('http');
+    var server  = http.createServer(app);
+
+    // Start the server
+    server.listen(settings.port, function () {
+        registry['start'](settings.port, settings.path);
+    });
+
+    // Setup middleware
+    app.use(require('./middleware/convert-middleware.js')(
+        settings.src,
+        [
+        require('./middleware/convert-middleware-less.js')
+            (settings.middleware.less),
+        require('./middleware/convert-middleware-coffee.js')
+            (settings.middleware.coffee)
+        ],
+        {dest: settings.dest}
+    ));
+
+    // Setup for coffee conversion
+    //app.use(require('coffee-middleware')(settings.src));
+
+    // Setup for markdown conversion
+    app.use(require('express-markdown')({directory:settings.src}));
+
+    // Catch all
+    app.use( express.static(settings.dest) );
+
+    return {
+        on: function(evt, cb)
+        {
+            registry[evt] = cb;
+        },
+        express: express,
+        app: app,
+        http: http,
+        server: server
+    };
 });
 
+if (require.main === module)
+{
+    var conf = require('./config.json');
 
-app.use(require('./middleware/convert-middleware.js')(conf_path,
-    [require('./middleware/convert-middleware-less.js')()]
-));
+    var s = server({
+        port: conf['port'] || 3000,
+        src : __dirname + (conf['src'] || '/public')
+    });
+    /*s.on('start', function(port, path){
+        console.log('Server port: ' + port);
+        console.log('Server path: ' + path);
+    })*/
+}
 
-// Setup for less conversion
-//app.use(require('less-middleware')(conf_path));
-
-// Setup for coffee conversion
-app.use(require('coffee-middleware')(conf_path));
-
-// Setup for markdown conversion
-app.use(require('express-markdown')({directory:conf_path}));
-
-// Catch all
-app.use( express.static(conf_path) );
-
-// current version: 3
+// current version: 4
 //
 // changelog
 // ---------
 //     2 - added support for less and coffee conversion
 //     3 - added support for markdown conversion
+//     4 - moved server logic into a closure

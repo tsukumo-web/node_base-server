@@ -41,6 +41,7 @@ module.exports = (function(source, array_of_parsers, options) {
     var settings = extend({
         dest: source,
         force: false,
+        debug: function(){},
         store: function(pathname, content, next)
         {
             // Only needs to be read, 511 is fine
@@ -53,16 +54,23 @@ module.exports = (function(source, array_of_parsers, options) {
         }
     }, options);
 
+    // Initial setup for parsers - feed them into a ductionary of
+    // arrays based on their to field.
+    var parsers = { };
+    for (var cnt = 0; cnt < array_of_parsers.length; cnt++)
+    {
+        var parser = array_of_parsers[cnt];
+        var to = parser.to;
+
+        if (parsers[to])
+            { parsers[to].push(parser); }
+        else
+            { parsers[to] = [parser]; }
+    }
+
     // Function handle for requests
     return function(req, res, next)
     {
-        // Handles errors, won't forward ENOENT
-        // @param {Object} err Error object to send to the next handle
-        function error(err)
-        {
-
-        }
-
         // Renders the file with the given parser
         // @param {String} input_file File to read from.
         // @param {String} output_file File to write to.
@@ -70,7 +78,7 @@ module.exports = (function(source, array_of_parsers, options) {
         //                        from the from type to the to type of file.
         function render(input_file, output_file, parser)
         {
-            console.log('Rendering: ' + input_file + ' -> ' + output_file);
+            settings.debug('Rendering: ' + input_file + ' -> ' + output_file);
 
             // Read in the file, pass on without error if there was a
             // problem reading the file.
@@ -107,7 +115,7 @@ module.exports = (function(source, array_of_parsers, options) {
                 var i = from + '.' + parser.from;
                 var o = to + '.' + parser.to;
 
-                console.log('Attempting to parse: ' + i + ' -> ' + o);
+                settings.debug('Attempting to parse: ' + i + ' -> ' + o);
 
                 // Ensure the file exists in the format of the parser
                 var istats;
@@ -173,7 +181,7 @@ module.exports = (function(source, array_of_parsers, options) {
                     return next();
                 }
             }
-            console.log('No parser found.');
+            settings.debug('No parser found.');
             // No parser was selected so move on as the file probably exists
             // in the to state already - otherwise a 404 will be sent anyway.
             return next();
@@ -190,24 +198,16 @@ module.exports = (function(source, array_of_parsers, options) {
         var pathbase =
             pathname.substr(0, pathname.length - ext.length - 1);
 
-        // Accumulate all parsers which can convert to the
-        // required file type.
-        var parsers = [ ];
-        for (var cnt = 0; cnt < array_of_parsers.length; cnt++)
-        {
-            var parser = array_of_parsers[cnt];
-
-            if (parser.to == ext)
-                { parsers.push(parser); }
-        }
+        // Get the list of parsers for this file type
+        var probable_parsers = parsers[ext];
 
         // If there are waiting parsers process them,
         // Otherwise just move to the next handle.
-        return (parsers.length != 0) ?
+        return (probable_parsers) ?
             process(
                 path.join(source, pathbase),
                 path.join(settings.dest, pathbase),
-                parsers)
+                probable_parsers)
             : next();
 
     }

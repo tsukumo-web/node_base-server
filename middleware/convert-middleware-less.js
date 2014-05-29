@@ -23,7 +23,12 @@ module.exports =
             relativeUrls: false
         },
         preprocess: function(src) { return src; },
-        postprocess: function(src) { return src; }
+        postprocess: function(src) { return src; },
+        error: function(file, type, msg)
+        {
+            console.log(type + ' error in ' + file + ': ' + msg);
+            return 'error processing file: ' + msg;
+        }
     }, options);
 
     return {
@@ -41,6 +46,8 @@ module.exports =
                 if (err)
                 {
                     //parse error
+                    src = settings.error(file, 'parse', err.message);
+                    return;
                 }
 
                 try
@@ -54,8 +61,10 @@ module.exports =
                 catch (compile_error)
                 {
                     //compile error
+                    src = settings.error(file, 'compile', err.message);
+                    return;
                 }
-            })
+            });
 
             src = settings.postprocess(src);
             return src;

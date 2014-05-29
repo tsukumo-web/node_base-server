@@ -11,8 +11,8 @@
         "express"          : "latest",
 
         "less"             : "latest",
+        "coffee-script"    : "latest",
 
-        "coffee-middleware": "latest",
         "express-markdown" : "latest"
     }
 }
