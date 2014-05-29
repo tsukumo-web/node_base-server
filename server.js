@@ -12,8 +12,9 @@ module.exports = server = (function(options){
 
         middleware:
         {
-            less   : { },
-            coffee : { }
+            less    : { },
+            coffee  : { },
+            markdown: { }
         }
     }, options);
     // Define after extend to collect extended source
@@ -41,16 +42,12 @@ module.exports = server = (function(options){
         require('./middleware/convert-middleware-less.js')
             (settings.middleware.less),
         require('./middleware/convert-middleware-coffee.js')
-            (settings.middleware.coffee)
+            (settings.middleware.coffee),
+        require('./middleware/convert-middleware-markdown.js')
+            (settings.middleware.markdown)
         ],
         {dest: settings.dest}
     ));
-
-    // Setup for coffee conversion
-    //app.use(require('coffee-middleware')(settings.src));
-
-    // Setup for markdown conversion
-    app.use(require('express-markdown')({directory:settings.src}));
 
     // Catch all
     app.use( express.static(settings.dest) );
