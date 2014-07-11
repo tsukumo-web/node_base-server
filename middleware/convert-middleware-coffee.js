@@ -5,6 +5,10 @@
 
 var extend = require('node.extend');
 var coffee = require('coffee-script');
+require('coffee-script/register');
+//coffee.register();
+
+var enable_safe_callback = require('./safe_callback');
 
 module.exports =
 (function(options){
@@ -15,42 +19,40 @@ module.exports =
         {
             bare: false
         },
+        timeout: 3000,
         // Pre, post process and error logging functions
         preprocess: function(src) { return src; },
-        postprocess: function(src) { return src; },
-        error: function(file, type, msg)
-        {
-            console.log(type + ' error in ' + file + ': ' + msg);
-            return 'error processing file: ' + msg;
-        }
+        postprocess: function(src) { return src; }
     }, options);
 
     return {
-        // This parser will convert from less to css
+        // This parser will convert from coffee to js
         from    : 'coffee',
         to      : 'js',
         // Compile function takes raw source and returns compiled js
-        // or an error message on parse of compilation error
+        // or an error message on parse or compilation error
         // @param {String} src Source content.
         // @param {String} file Name of the file being parsed.
+        // @param {Function} callback Function to call with error or file.
         // @return compiled source file.
-        compile : function(src, file)
+        compile : function(src, file, callback)
         {
             src = settings.preprocess(src);
+
+            var safe_callback = enable_safe_callback(callback, settings.timeout);
 
             try
             {
                 src = coffee.compile(src, extend({ }, settings.compiler, {
                     filename: file
-                })).js;
+                }));
             }
             catch(err)
             {
-                return settings.error(file, 'compile', err.message);
+                safe_callback('compile error in ' + file + ': ' + err.message);
             }
 
-            src = settings.postprocess(src);
-            return src;
+            safe_callback(undefined, settings.postprocess(src));
         }
     };
 

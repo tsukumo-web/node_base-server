@@ -12,6 +12,7 @@
 
         "less"             : "latest",
         "coffee-script"    : "latest",
-        "marked"           : "latest"
+        "marked"           : "latest",
+        "node-sass"        : "latest"
     }
 }

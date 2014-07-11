@@ -6,6 +6,8 @@
 var extend = require('node.extend');
 var marked = require('marked');
 
+var enable_safe_callback = require('./safe_callback');
+
 module.exports =
 (function(options){
 
@@ -13,13 +15,9 @@ module.exports =
         // Settings for the markdown compiler
         compiler: { }, // Leave marked defaults
         // Pre, post process and error logging functions
+        timeout: 3000,
         preprocess: function(src) { return src; },
-        postprocess: function(src) { return src; },
-        error: function(file, type, msg)
-        {
-            console.log(type + ' error in ' + file + ': ' + msg);
-            return 'error processing file: ' + msg;
-        }
+        postprocess: function(src) { return src; }
     }, options);
 
     marked.setOptions(settings.compiler);
@@ -33,9 +31,11 @@ module.exports =
         // @param {String} src Source content.
         // @param {String} file Name of the file being parsed.
         // @return compiled source file.
-        compile : function(src, file)
+        compile : function(src, file, callback)
         {
             src = settings.preprocess(src);
+
+            var safe_callback = enable_safe_callback(callback, settings.timeout);
 
             try
             {
@@ -43,11 +43,11 @@ module.exports =
             }
             catch(err)
             {
-                return settings.error(file, 'compile', err.message);
+                'compile error in ' + file + ': ' + err.message
             }
 
-            src = settings.postprocess(src);
-            return src;
+            safe_callback(undefined, settings.postprocess(src));
+
         }
     };
 

@@ -14,11 +14,14 @@ module.exports = server = (function(options){
         {
             less    : { },
             coffee  : { },
-            markdown: { }
+            markdown: { },
+            sass    : { }
         }
     }, options);
     // Define after extend to collect extended source
     settings.dest = settings.dest || settings.src;
+
+    console.log(settings);
 
     var registry = {
         start: function(port, path){ }
@@ -32,7 +35,7 @@ module.exports = server = (function(options){
 
     // Start the server
     server.listen(settings.port, function () {
-        registry['start'](settings.port, settings.path);
+        registry['start'](settings.port, settings.src);
     });
 
     // Setup middleware
@@ -44,7 +47,9 @@ module.exports = server = (function(options){
         require('./middleware/convert-middleware-coffee.js')
             (settings.middleware.coffee),
         require('./middleware/convert-middleware-markdown.js')
-            (settings.middleware.markdown)
+            (settings.middleware.markdown),
+        require('./middleware/convert-middleware-scss.js')
+            (settings.middleware.sass)
         ],
         {dest: settings.dest}
     ));
@@ -68,14 +73,31 @@ if (require.main === module)
 {
     var conf = require('./config.json');
 
-    var s = server({
+    var opts = {
         port: conf['port'] || 3000,
-        src : __dirname + (conf['src'] || '/public')
-    });
-    /*s.on('start', function(port, path){
+        src : __dirname + (conf['src'] || '/public'),
+        dest: __dirname + (conf['dest'] || '/public/_compiled'),
+        middleware:
+        {
+            sass:
+            {
+                includes: []
+            },
+            less:
+            {
+                includes: []
+            }
+        }
+    };
+    opts.middleware.sass.includes = [opts.src + '/libs']
+    opts.middleware.less.includes = [opts.src + '/libs']
+
+    var s = server(opts);
+
+    s.on('start', function(port, path){
         console.log('Server port: ' + port);
         console.log('Server path: ' + path);
-    })*/
+    });
 }
 
 // current version: 4

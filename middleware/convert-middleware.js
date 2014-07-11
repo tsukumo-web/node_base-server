@@ -7,6 +7,7 @@ var fs     = require('fs');
 var path   = require('path');
 var mkdirp = require('mkdirp');
 var extend = require('node.extend');
+//var touch  = require('touch');
 
 /* Closure represents the actual middleware, returns the function
  * to handle incoming requests.
@@ -41,7 +42,8 @@ module.exports = (function(source, array_of_parsers, options) {
     var settings = extend({
         dest: source,
         force: false,
-        debug: function(){},
+        debug: function(msg){ console.log(msg); },
+        error: function(msg){ console.log(msg); },
         store: function(pathname, content, next)
         {
             // Only needs to be read, 511 is fine
@@ -80,24 +82,33 @@ module.exports = (function(source, array_of_parsers, options) {
         {
             settings.debug('Rendering: ' + input_file + ' -> ' + output_file);
 
-            // Read in the file, pass on without error if there was a
-            // problem reading the file.
+            // Read in the file, to be processed
             fs.readFile(input_file, 'utf8', function(err, src) {
                 if (err)
                 {
-                    // In this case it is helpful to pass to the next handle
-                    // as the converted file may have been cached and a
-                    // read error for any reason should not have the site
-                    // display an error if there is a way to render the page.
+                    // If the file doesn't exist pass onto the next
+                    // without error, otherwise pass on the error.
                     return next( (err.code == 'ENOENT') ? null : err);
                 }
 
                 // Do the actual conversion work, depending on the parser
-                var output = parser.compile(src, path.basename(input_file));
+                parser.compile(src, input_file, function(err, data)
+                {
+                    // If there was an error compiling bail so the file
+                    // can be reparsed on a new request
+                    // TODO: create fail table, no reason to reparse if
+                    // file has not bee updated.
+                    if (err)
+                    {
+                        settings.error(err);
+                        next();
+                        return;
+                    }
+                    // When the callback returns with the data, store it
+                    // based on the function provided by the settings
+                    settings.store(output_file, data, next);
+                });
 
-                // Use the settings store function to save the file
-                // Questioning the use of this, it does not hurt to leave it
-                settings.store(output_file, output, next);
             });
         }
 

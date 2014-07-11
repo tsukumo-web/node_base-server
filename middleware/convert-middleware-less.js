@@ -5,6 +5,9 @@
 
 var extend = require('node.extend');
 var less   = require('less');
+var path   = require('path');
+
+var enable_safe_callback = require('./safe_callback');
 
 module.exports =
 (function(options){
@@ -25,14 +28,11 @@ module.exports =
             optimization: 0,
             relativeUrls: false
         },
+        includes: [ ],
+        timeout: 3000,
         // Pre, post process and error logging functions
         preprocess : function(src) { return src; },
-        postprocess: function(src) { return src; },
-        error      : function(file, type, msg)
-        {
-            console.log(type + ' error in ' + file + ': ' + msg);
-            return 'error processing file: ' + msg;
-        }
+        postprocess: function(src) { return src; }
     }, options);
 
     return {
@@ -40,11 +40,12 @@ module.exports =
         from    : 'less',
         to      : 'css',
         // Compile function takes raw source and returns compiled css
-        // or an error message on parse of compilation error
+        // or an error message on parse or compilation error
         // @param {String} src Source content.
         // @param {String} file Name of the file being parsed.
+        // @param {Function} callback Function to call with error or file.
         // @return compiled source file.
-        compile : function(src, file)
+        compile : function(src, file, callback)
         {
             src = settings.preprocess(src);
 
@@ -53,15 +54,18 @@ module.exports =
             //       of the compile function.. not sure it needs
             //       to be made every time
             var parser = new less.Parser(extend({ }, settings.parser, {
-                filename: file
+                filename: file,
+                paths: settings.includes.concat([path.dirname(file)])
             }));
 
-            // async? parsing
+            var safe_callback = enable_safe_callback(callback, settings.timeout);
+
+            // async parsing
             parser.parse(src, function(err, tree) {
                 if (err)
                 {
                     //parse error
-                    src = settings.error(file, 'parse', err.message);
+                    safe_callback('parse error in ' + file + ': ' + err.message);
                     return;
                 }
 
@@ -76,13 +80,12 @@ module.exports =
                 catch (compile_error)
                 {
                     //compile error
-                    src = settings.error(file, 'compile', err.message);
+                    safe_callback('compile error in ' + file + ': ' + compile_error.message);
                     return;
                 }
-            });
 
-            src = settings.postprocess(src);
-            return src;
+                safe_callback(undefined, settings.postprocess(src));
+            });
         }
     };
 
