@@ -13,7 +13,7 @@ module.exports =
 (function(options){
 
     var settings = extend({
-        // Settings for the coffee compiler
+        // Settings for the scss compiler
         compiler:
         {
             ouputStyle: 'compressed'
@@ -46,7 +46,7 @@ module.exports =
                 sass.render(extend({ }, settings.compiler, {
                     data: src,
                     error: function(err) {
-                        safe_callback('compile error in ' + file + ': ' + err.message);
+                        safe_callback('compile error in ' + file + ': ' + err);
                     },
                     includePaths: settings.includes.concat([path.dirname(file)]),
                     success: function(css){
