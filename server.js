@@ -22,8 +22,6 @@ module.exports = server = (function(options){
     // Define after extend to collect extended source
     settings.dest = settings.dest || settings.src;
 
-    console.log(settings);
-
     var registry = {
         start: function(port, path){ }
     };
@@ -54,7 +52,8 @@ module.exports = server = (function(options){
         require('./middleware/convert-middleware-jade.js')
             (settings.middleware.jade)
         ],
-        {dest: settings.dest}
+        {dest: settings.dest,
+        debug: function(){}}
     ));
 
     // Catch all
