@@ -21,7 +21,12 @@ X 0.2.1 - Response wrapping - pre/post compilation callbacks
 
 ## License
 
-The MIT License (MIT)
+[![CCLegal](http://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png "CC BY-NC-SA Legal Code")](http://creativecommons.org/licenses/by-nc-sa/4.0/deed.en_US "Creative Commons License")
+
+This work is licensed under a Creative Commons
+Attribution-NonCommercial-ShareAlike 4.0 International License.
+
+For more information visit the [Creative Commons Website]
 
 ## Author
 

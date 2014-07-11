@@ -80,20 +80,8 @@ if (require.main === module)
         port: conf['port'] || 3000,
         src : __dirname + (conf['src'] || '/public'),
         dest: __dirname + (conf['dest'] || '/public/_compiled'),
-        middleware:
-        {
-            sass:
-            {
-                includes: []
-            },
-            less:
-            {
-                includes: []
-            }
-        }
+
     };
-    opts.middleware.sass.includes = [opts.src + '/libs']
-    opts.middleware.less.includes = [opts.src + '/libs']
 
     var s = server(opts);
 
@@ -103,10 +91,11 @@ if (require.main === module)
     });
 }
 
-// current version: 4
+// current version: 5
 //
 // changelog
 // ---------
 //     2 - added support for less and coffee conversion
 //     3 - added support for markdown conversion
 //     4 - moved server logic into a closure
+//     5 - added support for sass and jade conversion

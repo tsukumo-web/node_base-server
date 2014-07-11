@@ -1,5 +1,5 @@
 {
-    "port": 3000,
-    "src" : "/testing",
-    "dest": "/testing/compiled"
+    //"port": 3000,
+    //"src" : "/public",
+    //"dest": "/public/_compiled"
 }
