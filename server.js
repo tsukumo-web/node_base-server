@@ -15,7 +15,8 @@ module.exports = server = (function(options){
             less    : { },
             coffee  : { },
             markdown: { },
-            sass    : { }
+            sass    : { },
+            jade    : { }
         }
     }, options);
     // Define after extend to collect extended source
@@ -49,7 +50,9 @@ module.exports = server = (function(options){
         require('./middleware/convert-middleware-markdown.js')
             (settings.middleware.markdown),
         require('./middleware/convert-middleware-scss.js')
-            (settings.middleware.sass)
+            (settings.middleware.sass),
+        require('./middleware/convert-middleware-jade.js')
+            (settings.middleware.jade)
         ],
         {dest: settings.dest}
     ));

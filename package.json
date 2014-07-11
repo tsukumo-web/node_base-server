@@ -13,6 +13,7 @@
         "less"             : "latest",
         "coffee-script"    : "latest",
         "marked"           : "latest",
-        "node-sass"        : "latest"
+        "node-sass"        : "latest",
+        "jade"             : "latest"
     }
 }
