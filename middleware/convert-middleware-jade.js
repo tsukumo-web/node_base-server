@@ -39,7 +39,7 @@ module.exports =
 
             try
             {
-                jade.render(src,　extend({ }, settings.compiler), function(err, data){
+                jade.render(src,　extend({filename:file}, settings.compiler), function(err, data){
                     if (err)
                         { throw err; }
 
